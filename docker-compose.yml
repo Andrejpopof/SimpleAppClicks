@@ -1,0 +1,37 @@
+version: '3'
+services:
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
+    build: ./nginx
+    ports:
+      - '3050:80'
+  api:
+    depends_on:
+      - mongo
+    build: ./backend
+    volumes:
+      - ./backend:/app
+    env_file:
+      - api.env
+    links:
+     - mongo
+  client:
+    restart: unless-stopped
+    build: ./frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+  mongo:
+    restart: unless-stopped
+    hostname: my_mongo
+    image: mongo
+    env_file:
+      - mongo.env
+    # ports:
+    #   - "27017:27017"
+    volumes:
+      - /home/andrej/Documents/data:/data/db
+    
